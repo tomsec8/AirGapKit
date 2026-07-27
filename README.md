@@ -1,2 +1,3 @@
-# AirGapKit
-100% Client-Side PDF, Image, Convert &amp; Security Toolkit
+# WXT + React
+
+This template should help get you started developing with React in WXT.
