@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as Icons from 'lucide-react';
+import { sanitizeUrl } from '../../utils/sanitize';
 
 interface ImagePreviewModalProps {
   isOpen: boolean;
@@ -117,7 +118,7 @@ export function ImagePreviewModal({ isOpen, imageUrl, title, onClose }: ImagePre
 
         <div style={{ flex: 1, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', minHeight: '380px', padding: '16px', background: '#121214', borderRadius: '12px' }}>
           <img 
-            src={imageUrl} 
+            src={sanitizeUrl(imageUrl)} 
             alt={title || 'Preview'} 
             style={{ 
               maxWidth: isRotated90or270 ? '55vh' : '100%', 

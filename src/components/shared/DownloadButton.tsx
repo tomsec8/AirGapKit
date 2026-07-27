@@ -1,4 +1,5 @@
 import React from 'react';
+import { sanitizeUrl } from '../../utils/sanitize';
 
 interface DownloadButtonProps {
   blob: Blob | Uint8Array;
@@ -14,7 +15,7 @@ export function DownloadButton({ blob, filename, label = 'Download Result' }: Do
       
     const url = URL.createObjectURL(dataBlob);
     const a = document.createElement('a');
-    a.href = url;
+    a.href = sanitizeUrl(url);
     a.download = filename;
     document.body.appendChild(a);
     a.click();
