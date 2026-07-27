@@ -28,7 +28,7 @@
     "piexifjs": "^1.0.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-router-dom": "^7.18.1",
+    "react-router-dom": "7.11.0",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
@@ -37,5 +37,14 @@
     "@wxt-dev/module-react": "^1.1.5",
     "typescript": "^5.9.3",
     "wxt": "^0.20.27"
+  },
+  "overrides": {
+    "shell-quote": "^1.8.5",
+    "adm-zip": "^0.5.14",
+    "uuid": "^11.1.1",
+    "brace-expansion": "^2.0.1",
+    "minimatch": "^10.0.3",
+    "tmp": "^0.2.6",
+    "esbuild": "^0.28.1"
   }
 }
