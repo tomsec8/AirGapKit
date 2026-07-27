@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import * as Icons from 'lucide-react';
 import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
+import { downloadFileWithDialog } from '../../../utils/fileSaver';
 import * as pdfjsLib from 'pdfjs-dist';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -24,21 +24,7 @@ export function PdfToZip() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const saveFileWithPicker = async (blob: Blob, suggestedName: string) => {
-    try {
-      if (typeof chrome !== 'undefined' && chrome.downloads) {
-        const url = URL.createObjectURL(blob);
-        await chrome.downloads.download({
-          url: url,
-          filename: suggestedName,
-          saveAs: true
-        });
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-        return;
-      }
-    } catch (err) {
-      console.warn("chrome.downloads failed, falling back to saveAs:", err);
-    }
-    saveAs(blob, suggestedName);
+    await downloadFileWithDialog(blob, suggestedName);
   };
 
   const handleFileDrop = (e: React.DragEvent) => {

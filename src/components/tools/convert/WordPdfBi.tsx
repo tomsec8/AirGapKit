@@ -5,7 +5,7 @@ import { PDFDocument, rgb } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import mammoth from 'mammoth';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
-import { saveAs } from 'file-saver';
+import { downloadFileWithDialog } from '../../../utils/fileSaver';
 import JSZip from 'jszip';
 import { useNavigate } from 'react-router-dom';
 
@@ -55,21 +55,7 @@ export function WordPdfBi() {
 
     const typedBlob = blob.type === mime ? blob : new Blob([blob], { type: mime });
 
-    try {
-      if (typeof chrome !== 'undefined' && chrome.downloads) {
-        const url = URL.createObjectURL(typedBlob);
-        await chrome.downloads.download({
-          url: url,
-          filename: suggestedName,
-          saveAs: true
-        });
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-        return;
-      }
-    } catch (err) {
-      console.warn("chrome.downloads failed, falling back to saveAs:", err);
-    }
-    saveAs(typedBlob, suggestedName);
+    await downloadFileWithDialog(typedBlob, suggestedName);
   };
 
   const handleFileDrop = (e: React.DragEvent) => {
@@ -163,9 +149,7 @@ export function WordPdfBi() {
         </html>
       `;
 
-      iframeDoc.open();
-      iframeDoc.write(printHtml);
-      iframeDoc.close();
+      iframe.srcdoc = printHtml;
 
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -345,9 +329,7 @@ export function WordPdfBi() {
         </html>
       `;
 
-      iframeDoc.open();
-      iframeDoc.write(printHtml);
-      iframeDoc.close();
+      iframe.srcdoc = printHtml;
 
       await new Promise(resolve => setTimeout(resolve, 500));
 

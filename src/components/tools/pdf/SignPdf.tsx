@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import * as Icons from 'lucide-react';
 import { saveAs } from 'file-saver';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
+import { downloadFileWithDialog } from '../../../utils/fileSaver';
+import { sanitizeUrl } from '../../../utils/sanitize';
 import * as pdfjsLib from 'pdfjs-dist';
 
 // Configure PDF.js worker to local bundled worker
@@ -736,7 +738,7 @@ export function SignPdf() {
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
-                        <img src={s.dataUrl} alt={s.title} style={{ height: '28px', maxWidth: '70px', objectFit: 'contain', background: '#ffffff', borderRadius: '4px', padding: '2px' }} />
+                        <img src={sanitizeUrl(s.dataUrl)} alt={s.title} style={{ height: '28px', maxWidth: '70px', objectFit: 'contain', background: '#ffffff', borderRadius: '4px', padding: '2px' }} />
                         <span style={{ fontSize: '12px', color: '#ffffff', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.title}</span>
                       </div>
                       <button onClick={(e) => deleteSavedSignature(s.id, e)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}>
@@ -940,7 +942,7 @@ export function SignPdf() {
                     title="Click or drag to position stamp"
                   >
                     <img 
-                      src={st.dataUrl} 
+                      src={sanitizeUrl(st.dataUrl)} 
                       alt={st.title} 
                       style={{ width: '100%', height: 'auto', display: 'block', pointerEvents: 'none' }}
                     />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import * as Icons from 'lucide-react';
-import { saveAs } from 'file-saver';
+import { downloadFileWithDialog } from '../../../utils/fileSaver';
+import { sanitizeUrl } from '../../../utils/sanitize';
 import JSZip from 'jszip';
 import { useNavigate } from 'react-router-dom';
 import { ImagePreviewModal } from '../../common/ImagePreviewModal';
@@ -41,21 +42,7 @@ export function SvgImageBi() {
 
     const typedBlob = blob.type === mime ? blob : new Blob([blob], { type: mime });
 
-    try {
-      if (typeof chrome !== 'undefined' && chrome.downloads) {
-        const url = URL.createObjectURL(typedBlob);
-        await chrome.downloads.download({
-          url: url,
-          filename: suggestedName,
-          saveAs: true
-        });
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-        return;
-      }
-    } catch (err) {
-      console.warn("chrome.downloads failed, falling back to saveAs:", err);
-    }
-    saveAs(typedBlob, suggestedName);
+    await downloadFileWithDialog(typedBlob, suggestedName);
   };
 
   const handleFileDrop = (e: React.DragEvent) => {
@@ -303,9 +290,9 @@ export function SvgImageBi() {
               return (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 14px', background: '#2c2c2e', borderRadius: '8px', marginBottom: '8px' }}>
                   <img 
-                    src={URL.createObjectURL(file)} 
+                    src={sanitizeUrl(URL.createObjectURL(file))} 
                     alt={file.name} 
-                    onClick={() => setZoomItem({ url: URL.createObjectURL(file), title: file.name })}
+                    onClick={() => setZoomItem({ url: sanitizeUrl(URL.createObjectURL(file)), title: file.name })}
                     title="Click to enlarge preview"
                     style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '6px', background: '#121214', flexShrink: 0, cursor: 'zoom-in' }} 
                   />
