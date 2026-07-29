@@ -1,4 +1,4 @@
-# AirGapKit – The Ultimate Offline Toolkit 🛡️
+# <img src="https://raw.githubusercontent.com/tomsec8/AirGapKit/main/chrome-mv3/icon/128.png" alt="AirGapKit Icon" width="40" align="center" /> AirGapKit – The Ultimate Offline Toolkit
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
