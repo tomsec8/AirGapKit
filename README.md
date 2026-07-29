@@ -7,6 +7,16 @@
 
 Designed for professionals, students, and privacy-conscious users, AirGapKit provides a robust suite of over 20+ essential daily tools. From PDF manipulation and file conversion to image optimization—everything runs **100% locally** on your machine. No internet required. No cloud uploads. Complete privacy.
 
+<p align="center">
+  <a href="https://chromewebstore.google.com/detail/airgapkit-%E2%80%94-offline-file/odenlfcjhkblnifbiepjkkimicajfllo">
+    <picture>
+      <source srcset="https://i.imgur.com/XBIE9pk.png" media="(prefers-color-scheme: dark)">
+      <img height="58" src="https://i.imgur.com/oGxig2F.png" alt="Chrome Web Store">
+    </picture>
+  </a>
+</p>
+
+
 ---
 
 ## ✨ Why AirGapKit?
