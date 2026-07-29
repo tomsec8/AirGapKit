@@ -1,9 +1,14 @@
-# <img src="https://raw.githubusercontent.com/tomsec8/AirGapKit/main/chrome-mv3/icon/128.png" alt="AirGapKit Icon" width="40" align="center" /> AirGapKit – The Ultimate Offline Toolkit
+# AirGapKit – The Ultimate Offline Toolkit
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/tomsec8/AirGapKit/main/chrome-mv3/icon/128.png" alt="AirGapKit Icon" width="128" />
+</p>
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
 **A comprehensive, privacy-first productivity suite that transforms your browser into an offline powerhouse.**
+
 
 Designed for professionals, students, and privacy-conscious users, AirGapKit provides a robust suite of over 20+ essential daily tools. From PDF manipulation and file conversion to image optimization—everything runs **100% locally** on your machine. No internet required. No cloud uploads. Complete privacy.
 
