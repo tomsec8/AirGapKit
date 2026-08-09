@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="AirGapKit — privacy-first offline browser toolkit for PDF, images, Office files, and security. Your files never leave your device." />
+  <title>AirGapKit — Offline file tools in your browser</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #14212b;
+      --ink-soft: #3a4a57;
+      --paper: #f3f6f4;
+      --paper-2: #e7eeea;
+      --line: #c9d5cf;
+      --teal: #0f6e6a;
+      --teal-deep: #0a4f4c;
+      --sand: #d8c3a5;
+      --white: #ffffff;
+      --max: 1120px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Outfit", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+
+    .wrap {
+      width: min(100% - 2.5rem, var(--max));
+      margin-inline: auto;
+    }
+
+    /* —— Nav —— */
+    .nav {
+      position: absolute;
+      inset: 0 0 auto 0;
+      z-index: 5;
+      padding: 1.25rem 0;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .nav-brand {
+      font-family: "Fraunces", serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+      color: var(--white);
+    }
+    .nav-link {
+      color: rgba(255,255,255,0.82);
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+    }
+    .nav-link:hover { color: var(--white); border-color: rgba(255,255,255,0.5); }
+
+    /* —— Hero —— */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      align-items: end;
+      overflow: hidden;
+      color: var(--white);
+      background:
+        radial-gradient(1200px 700px at 80% 20%, rgba(216,195,165,0.28), transparent 55%),
+        radial-gradient(900px 600px at 10% 90%, rgba(15,110,106,0.55), transparent 50%),
+        linear-gradient(160deg, #0c1a22 0%, #14343a 48%, #0f6e6a 100%);
+    }
+    .hero-plane {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.55), transparent 85%);
+      animation: gridDrift 28s linear infinite;
+    }
+    @keyframes gridDrift {
+      from { background-position: 0 0, 0 0; }
+      to { background-position: 56px 56px, 56px 56px; }
+    }
+    .hero-docs {
+      position: absolute;
+      right: -4%;
+      top: 12%;
+      width: min(52vw, 560px);
+      height: min(70vh, 640px);
+      pointer-events: none;
+      opacity: 0.9;
+      animation: floatDocs 7s ease-in-out infinite;
+    }
+    @keyframes floatDocs {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-14px) rotate(-1deg); }
+    }
+    .doc {
+      position: absolute;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.22);
+      backdrop-filter: blur(2px);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+    }
+    .doc-a { width: 68%; height: 78%; right: 8%; top: 4%; transform: rotate(7deg); }
+    .doc-b { width: 58%; height: 66%; right: 28%; top: 22%; transform: rotate(-6deg); background: linear-gradient(180deg, rgba(216,195,165,0.35), rgba(255,255,255,0.08)); }
+    .doc-c { width: 46%; height: 52%; right: 18%; top: 42%; transform: rotate(3deg); }
+    .doc-lines {
+      position: absolute;
+      inset: 18% 14%;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.28) 0 2px,
+        transparent 2px 18px
+      );
+      opacity: 0.55;
+      border-radius: 2px;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 2;
+      padding: 0 0 4.5rem;
+      max-width: 640px;
+      animation: riseIn 1s var(--ease) both;
+    }
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hero-brand {
+      font-family: "Fraunces", serif;
+      font-weight: 700;
+      font-size: clamp(3.4rem, 9vw, 6.4rem);
+      line-height: 0.92;
+      letter-spacing: -0.045em;
+      margin-bottom: 1.25rem;
+    }
+    .hero-line {
+      font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+      font-weight: 500;
+      max-width: 28ch;
+      margin-bottom: 0.75rem;
+    }
+    .hero-sub {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.78);
+      max-width: 38ch;
+      margin-bottom: 1.75rem;
+    }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.9rem 1.35rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.98rem;
+      border: 1px solid transparent;
+      transition: transform 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s var(--ease);
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background: var(--sand);
+      color: var(--ink);
+    }
+    .btn-primary:hover { background: #e4d0b4; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--white);
+      border-color: rgba(255,255,255,0.35);
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.7); }
+    .btn-dark {
+      background: var(--ink);
+      color: var(--white);
+    }
+    .btn-dark:hover { background: #1d2e3b; }
+
+    /* —— Sections —— */
+    section { padding: 5.5rem 0; }
+    .section-kicker {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.85rem;
+    }
+    .section-title {
+      font-family: "Fraunces", serif;
+      font-size: clamp(2rem, 4.5vw, 3.1rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 0.85rem;
+      max-width: 16ch;
+    }
+    .section-lead {
+      color: var(--ink-soft);
+      font-size: 1.08rem;
+      max-width: 42ch;
+      margin-bottom: 2.5rem;
+    }
+
+    .promise {
+      background:
+        linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .promise-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 3rem;
+      align-items: end;
+    }
+    .promise-stat {
+      font-family: "Fraunces", serif;
+      font-size: clamp(3.5rem, 8vw, 5.5rem);
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      color: var(--teal-deep);
+    }
+    .promise-stat span {
+      display: block;
+      font-family: "Outfit", sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0;
+      color: var(--ink-soft);
+      margin-top: 0.85rem;
+      font-weight: 500;
+      max-width: 22ch;
+    }
+
+    /* —— Tools —— */
+    .tools { background: var(--white); }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0.75rem;
+    }
+    .tab {
+      appearance: none;
+      background: transparent;
+      border: 0;
+      color: var(--ink-soft);
+      padding: 0.55rem 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.92rem;
+      transition: background 0.2s var(--ease), color 0.2s var(--ease);
+    }
+    .tab:hover { color: var(--ink); background: var(--paper-2); }
+    .tab.is-active {
+      background: var(--teal);
+      color: var(--white);
+    }
+    .tool-panel[hidden] { display: none; }
+    .tool-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+      border-top: 1px solid var(--line);
+    }
+    .tool-list li {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
+      gap: 1rem;
+      padding: 1.05rem 0.2rem;
+      border-bottom: 1px solid var(--line);
+      align-items: baseline;
+    }
+    .tool-name {
+      font-weight: 650;
+      font-size: 1rem;
+    }
+    .tool-desc {
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+    }
+
+    /* —— How —— */
+    .how {
+      background:
+        radial-gradient(700px 400px at 100% 0%, rgba(15,110,106,0.08), transparent 60%),
+        var(--paper);
+    }
+    .steps {
+      list-style: none;
+      display: grid;
+      gap: 1.5rem;
+      counter-reset: step;
+      max-width: 720px;
+    }
+    .steps li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.1rem;
+      align-items: start;
+      counter-increment: step;
+    }
+    .steps li::before {
+      content: counter(step, decimal-leading-zero);
+      font-family: "Fraunces", serif;
+      font-size: 1.6rem;
+      color: var(--teal);
+      line-height: 1;
+      padding-top: 0.15rem;
+    }
+    .steps h3 {
+      font-size: 1.15rem;
+      font-weight: 650;
+      margin-bottom: 0.25rem;
+    }
+    .steps p { color: var(--ink-soft); max-width: 46ch; }
+
+    /* —— CTA band —— */
+    .cta-band {
+      background: var(--ink);
+      color: var(--white);
+      padding: 4.5rem 0;
+    }
+    .cta-band h2 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: -0.03em;
+      max-width: 14ch;
+      margin-bottom: 0.75rem;
+    }
+    .cta-band p {
+      color: rgba(255,255,255,0.72);
+      max-width: 40ch;
+      margin-bottom: 1.5rem;
+    }
+
+    footer {
+      padding: 2rem 0 2.5rem;
+      border-top: 1px solid var(--line);
+      color: var(--ink-soft);
+      font-size: 0.92rem;
+    }
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    footer strong {
+      color: var(--ink);
+      font-family: "Fraunces", serif;
+      font-weight: 700;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    }
+    .reveal.is-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 860px) {
+      .hero-docs { opacity: 0.35; width: 70vw; right: -18%; top: 8%; }
+      .promise-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .tool-list { grid-template-columns: 1fr; }
+      .tool-list li { grid-template-columns: 1fr; gap: 0.25rem; }
+      .hero-copy { padding-bottom: 3.5rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-plane, .hero-docs, .hero-copy, .reveal { animation: none !important; transition: none !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero" id="top">
+    <div class="hero-plane" aria-hidden="true"></div>
+    <div class="hero-docs" aria-hidden="true">
+      <div class="doc doc-a"><div class="doc-lines"></div></div>
+      <div class="doc doc-b"><div class="doc-lines"></div></div>
+      <div class="doc doc-c"><div class="doc-lines"></div></div>
+    </div>
+
+    <nav class="nav" aria-label="Primary">
+      <div class="wrap nav-inner">
+        <a class="nav-brand" href="#top">AirGapKit</a>
+        <a class="nav-link" href="#tools">Tools</a>
+      </div>
+    </nav>
+
+    <div class="wrap hero-copy">
+      <h1 class="hero-brand">AirGapKit</h1>
+      <p class="hero-line">Fifty local file tools. Zero uploads.</p>
+      <p class="hero-sub">A privacy-first browser extension for PDF, images, Office, and security — everything runs on your machine.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/tomsec8/AirGapKit" id="cta-primary">Get AirGapKit</a>
+        <a class="btn btn-ghost" href="#tools">Browse capabilities</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="promise" id="promise">
+    <div class="wrap promise-grid reveal">
+      <div>
+        <p class="section-kicker">The air gap</p>
+        <h2 class="section-title">Your files stay where they are.</h2>
+        <p class="section-lead">No cloud pipeline. No mystery servers. Open a file, process it offline, download the result. Built for people who treat documents like private property.</p>
+      </div>
+      <div class="promise-stat">
+        50+
+        <span>tools across PDF, convert, security, image, office, and text — in one extension.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="tools" id="tools">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="section-kicker">Capability map</p>
+        <h2 class="section-title">What you can do.</h2>
+        <p class="section-lead">Pick a suite. Every tool below ships in AirGapKit today.</p>
+      </div>
+
+      <div class="tabs reveal" role="tablist" aria-label="Tool suites">
+        <button class="tab is-active" role="tab" aria-selected="true" data-tab="pdf">PDF</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="convert">Convert</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="security">Security</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="image">Image</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="office">Office</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="text">Text &amp; Data</button>
+      </div>
+
+      <div class="tool-panel reveal" data-panel="pdf">
+        <ul class="tool-list">
+          <li><span class="tool-name">Merge PDF</span><span class="tool-desc">Combine multiple PDFs into one document</span></li>
+          <li><span class="tool-name">PDF Page Manager</span><span class="tool-desc">Split, delete, reorder &amp; rotate pages visually</span></li>
+          <li><span class="tool-name">Compress PDF</span><span class="tool-desc">Shrink size with optional advanced optimizations</span></li>
+          <li><span class="tool-name">Sign PDF</span><span class="tool-desc">Place visual signatures on pages</span></li>
+          <li><span class="tool-name">Fill Form &amp; Edit</span><span class="tool-desc">Fill interactive forms and add text</span></li>
+          <li><span class="tool-name">Create Fillable Form</span><span class="tool-desc">Draw text fields and checkboxes onto PDFs</span></li>
+          <li><span class="tool-name">Annotate PDF</span><span class="tool-desc">Highlights, notes, and freehand ink</span></li>
+          <li><span class="tool-name">Redact PDF</span><span class="tool-desc">Permanently cover sensitive regions</span></li>
+          <li><span class="tool-name">Watermark &amp; Numbers</span><span class="tool-desc">Add watermarks and page numbers</span></li>
+          <li><span class="tool-name">PDF Lock ⇄ Unlock</span><span class="tool-desc">Password-protect or remove protection</span></li>
+          <li><span class="tool-name">PDF Compare</span><span class="tool-desc">Side-by-side visual document compare</span></li>
+          <li><span class="tool-name">PDF Repair</span><span class="tool-desc">Fix broken indexes and xref tables</span></li>
+          <li><span class="tool-name">Crop PDF</span><span class="tool-desc">Trim margins and unwanted areas</span></li>
+          <li><span class="tool-name">Flatten PDF</span><span class="tool-desc">Burn form fields into static content</span></li>
+          <li><span class="tool-name">PDF OCR</span><span class="tool-desc">Searchable PDFs with offline language packs</span></li>
+          <li><span class="tool-name">PDF Overlay</span><span class="tool-desc">Stamp one PDF onto another</span></li>
+          <li><span class="tool-name">Change Page Size</span><span class="tool-desc">Convert pages to A4, Letter, and more</span></li>
+          <li><span class="tool-name">Document Info</span><span class="tool-desc">Edit title, author, subject, keywords</span></li>
+          <li><span class="tool-name">PDF Viewer</span><span class="tool-desc">Built-in reader with zoom and search</span></li>
+        </ul>
+      </div>
+
+      <div class="tool-panel" data-panel="convert" hidden>
+        <ul class="tool-list">
+          <li><span class="tool-name">PDF ⇄ Image</span><span class="tool-desc">Pages to images, or PNG/JPEG/WEBP/SVG into PDF</span></li>
+          <li><span class="tool-name">Word ⇄ PDF</span><span class="tool-desc">DOCX to PDF and PDF back to editable Word</span></li>
+          <li><span class="tool-name">Excel → PDF</span><span class="tool-desc">Spreadsheets and CSV to printable PDF tables</span></li>
+          <li><span class="tool-name">Text → PDF</span><span class="tool-desc">Plain text or .txt files to A4 PDF</span></li>
+          <li><span class="tool-name">Excel ⇄ CSV / JSON</span><span class="tool-desc">Spreadsheet data in and out of structured formats</span></li>
+          <li><span class="tool-name">SVG ⇄ Image</span><span class="tool-desc">Rasterize SVG or vectorize images</span></li>
+          <li><span class="tool-name">Format Transcoder</span><span class="tool-desc">Convert between PNG, JPEG, WebP, AVIF</span></li>
+          <li><span class="tool-name">Media Extractor</span><span class="tool-desc">Pull embedded images from PDF &amp; Office files</span></li>
+          <li><span class="tool-name">PDF to ZIP</span><span class="tool-desc">Export pages as separate files in a ZIP</span></li>
+        </ul>
+      </div>
+
+      <div class="tool-panel" data-panel="security" hidden>
+        <ul class="tool-list">
+          <li><span class="tool-name">Metadata Stripper</span><span class="tool-desc">Clean EXIF, Office logs, and PDF identifiers</span></li>
+          <li><span class="tool-name">File Hash Generator</span><span class="tool-desc">SHA-256, SHA-512, and MD5 locally</span></li>
+          <li><span class="tool-name">Binary File Compare</span><span class="tool-desc">Bit-for-bit equality checks</span></li>
+          <li><span class="tool-name">AES-256 Encrypt</span><span class="tool-desc">Encrypt or decrypt any file with AES-GCM</span></li>
+          <li><span class="tool-name">Password Generator</span><span class="tool-desc">Cryptographically strong local passwords</span></li>
+          <li><span class="tool-name">File Shredder</span><span class="tool-desc">Zero-fill wipe sensitive file data in memory</span></li>
+        </ul>
+      </div>
+
+      <div class="tool-panel" data-panel="image" hidden>
+        <ul class="tool-list">
+          <li><span class="tool-name">Image Editor Suite</span><span class="tool-desc">Crop, resize, rotate, and flip</span></li>
+          <li><span class="tool-name">Document Scanner</span><span class="tool-desc">Enhance photos into clean scan-style pages</span></li>
+          <li><span class="tool-name">Compress Image</span><span class="tool-desc">Shrink JPG, PNG, and WebP files</span></li>
+          <li><span class="tool-name">Blur &amp; Anonymize</span><span class="tool-desc">Obscure faces, plates, and sensitive regions</span></li>
+          <li><span class="tool-name">Watermark Image</span><span class="tool-desc">Overlay text or logo marks</span></li>
+          <li><span class="tool-name">Background Remover</span><span class="tool-desc">Remove backgrounds offline</span></li>
+        </ul>
+      </div>
+
+      <div class="tool-panel" data-panel="office" hidden>
+        <ul class="tool-list">
+          <li><span class="tool-name">Merge &amp; Split CSVs</span><span class="tool-desc">Combine CSVs into Excel tabs or one file</span></li>
+          <li><span class="tool-name">Word to Text / HTML</span><span class="tool-desc">Extract clean text and HTML from Word</span></li>
+          <li><span class="tool-name">Office Viewer</span><span class="tool-desc">Read Word and Excel documents in-app</span></li>
+        </ul>
+      </div>
+
+      <div class="tool-panel" data-panel="text" hidden>
+        <ul class="tool-list">
+          <li><span class="tool-name">Text Cleaner Suite</span><span class="tool-desc">Spaces, duplicates, sort, and replace</span></li>
+          <li><span class="tool-name">Text Inspector &amp; Case</span><span class="tool-desc">Counts plus UPPER / lower / Title case</span></li>
+          <li><span class="tool-name">Data Extractor</span><span class="tool-desc">Pull emails, URLs, and phone numbers</span></li>
+          <li><span class="tool-name">Text Diff</span><span class="tool-desc">Compare two blocks side by side</span></li>
+          <li><span class="tool-name">JSON Formatter</span><span class="tool-desc">Validate, format, and minify JSON</span></li>
+          <li><span class="tool-name">Base64 &amp; URL Encoder</span><span class="tool-desc">Encode and decode common text formats</span></li>
+          <li><span class="tool-name">Markdown Editor</span><span class="tool-desc">Live preview with PDF export</span></li>
+          <li><span class="tool-name">Generate QR Code</span><span class="tool-desc">Offline QR from any text or URL</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="how" id="how">
+    <div class="wrap reveal">
+      <p class="section-kicker">Workflow</p>
+      <h2 class="section-title">Three steps. Still offline.</h2>
+      <p class="section-lead">Designed for focused work, not account dashboards.</p>
+      <ol class="steps">
+        <li>
+          <div>
+            <h3>Install the extension</h3>
+            <p>Load AirGapKit in Chrome or Firefox. Your toolkit lives in the browser — not on a remote workspace.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3>Drop a file into a tool</h3>
+            <p>PDF, image, spreadsheet, or text. Processing happens in memory on your device.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3>Save the result</h3>
+            <p>Download the output when you are ready. Nothing was uploaded along the way.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="wrap reveal">
+      <h2>Keep the gap closed.</h2>
+      <p>AirGapKit is the offline file suite for people who do not want their documents touring the internet.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/tomsec8/AirGapKit" id="cta-secondary">Get AirGapKit</a>
+        <a class="btn btn-ghost" href="https://github.com/tomsec8/AirGapKit" id="cta-source">View source</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <div><strong>AirGapKit</strong> — offline by design.</div>
+      <div><a href="https://github.com/tomsec8/AirGapKit">tomsec8/AirGapKit</a></div>
+    </div>
+  </footer>
+
+  <script>
+    // —— Tabs ——
+    const tabs = document.querySelectorAll(".tab");
+    const panels = document.querySelectorAll(".tool-panel");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const id = tab.dataset.tab;
+        tabs.forEach((t) => {
+          t.classList.toggle("is-active", t === tab);
+          t.setAttribute("aria-selected", t === tab ? "true" : "false");
+        });
+        panels.forEach((panel) => {
+          panel.hidden = panel.dataset.panel !== id;
+        });
+      });
+    });
+
+    // —— Reveal on scroll ——
+    const reveals = document.querySelectorAll(".reveal");
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-in");
+              io.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+      );
+      reveals.forEach((el) => io.observe(el));
+    } else {
+      reveals.forEach((el) => el.classList.add("is-in"));
+    }
+  </script>
+</body>
+</html>
